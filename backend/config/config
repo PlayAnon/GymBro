@@ -1,0 +1,28 @@
+const env = process.env.NODE_ENV || "dev";
+
+const config = ()=>{
+    switch(env){
+        case "dev":
+        
+        return {
+            bd_string: 'mongodb+srv://usuario_admin:DaQAXfQ9x6ktiOKU@clusterapi.gvizzel.mongodb.net/?retryWrites=true&w=majority',
+            password_token: 'DaQAXfQ9x6ktiOKU'
+        }
+
+        case "hml":
+        return {
+            bd_string: 'mongodb+srv://usuario_admin:DaQAXfQ9x6ktiOKU@clusterapi.gvizzel.mongodb.net/?retryWrites=true&w=majority',
+            password_token: 'DaQAXfQ9x6ktiOKU'
+        }
+
+        case "prod":
+        return {
+            bd_string: 'mongodb+srv://usuario_admin:DaQAXfQ9x6ktiOKU@clusterapi.gvizzel.mongodb.net/?retryWrites=true&w=majority',
+            password_token: 'DaQAXfQ9x6ktiOKU'
+        }
+    }
+}
+
+console.log(`Iniciando a API em ambiente ${env.toUpperCase()}`)
+
+module.exports = config()
