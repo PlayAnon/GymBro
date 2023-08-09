@@ -8,9 +8,6 @@ const TelaCadastro3 = ({route}) => {
 
   // Dados da tela anterior
   const {email,senha,nome,peso,altura,idade} = route.params;
- 
-  // Tempo de treino do usuario
-  const [tempoTreino, setTempoTreino] = React.useState(-1);
   
   return (
     <View style={styles.telacadastro3}>

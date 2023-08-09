@@ -35,6 +35,7 @@ router.post('/create', async (req, res) =>{
         return res.status(201).send({user, token: createUserToken(user._id)});
   
     }catch(err){
+        console.log(err);
         return res.status(500).send({error: 'Erro ao buscar usuário'});
     }
 })

@@ -5,43 +5,50 @@ import { Color, Border, FontFamily, FontSize } from "../GlobalStyles";
 import Geolocation from '@react-native-community/geolocation';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Api } from "../Api";
-
+import { useCookies } from "react-cookie";
 
 const TelaCadastro7 = ({ route }) => {
   const navigation = useNavigation();
 
   // Dados da tela anterior
-  const { email, senha, nome, peso, altura, idade, tempoTreino, objetivoP, uriImg, descricao } = route.params;
+  let { email, senha, nome, peso, altura, idade, tempoTreino, objetivoP, uriImg, descricao } = route.params;
 
-  const [lat, setLatitude] = React.useState(0)
-  const [lon, setLongitude] = React.useState(0)
-  const [nomeLocal, setNomeLocal] = React.useState("")
-  const [user, setUser] = React.useState([])
+  let nomeLocal = '';
+  let lat = 0;
+  let lon = 0;
+
+  const [cookies, setCookie, removeCookie] = useCookies(['user']);
 
 
   async function cadastrarUser2() {
-  try {
-    const pos = await new Promise((resolve, reject) => {
-      Geolocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: true,
-        timeout: 120000,
-        maximumAge: 1000,
+    try {
+      const pos = await new Promise((resolve, reject) => {
+        Geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 120000,
+          maximumAge: 1000,
+        });
       });
-    });
 
-    setLatitude(pos.coords.latitude);
-    setLongitude(pos.coords.longitude);
+      lat = pos.coords.latitude;
+      lon = pos.coords.longitude;
 
-    if (lat !== 0 && lon !== 0) {
-      const res = await Api.post("/users/create", {
+      Api.post("/users/create", {
         email, senha, nome, peso, altura, idade, tempoTreino, objetivoP, uriImg, descricao, nomeLocal, lat, lon
-      });
+      }).then(res => {
 
-      setUser(res.data.user);
-      Alert.alert("Sucesso", "Usuário criado com sucesso!");
-      navigation.navigate("TelaHome", { user });
-    }
-  } catch (error) {
+        const token = res.data.token;
+        const user = res.data.user;
+        setCookie('Token', token);
+        setCookie('UserId', user._id);
+        navigation.navigate("TelaHome");
+      })
+        .catch(error => {
+          Alert.alert("Alerta", error.message());
+          return error;
+        });
+
+    } catch (error) {
       if (error.code === error.PERMISSION_DENIED) {
         Alert.alert('Erro', 'Permissão de localização negada. Verifique as configurações do dispositivo.');
       } else if (error.code === error.POSITION_UNAVAILABLE) {
@@ -51,55 +58,30 @@ const TelaCadastro7 = ({ route }) => {
       } else {
         Alert.alert('Erro', 'Erro ao obter a localização do usuário: ' + error.message);
       }
-  }
-}
-/*
-  useEffect(() => {
-    Geolocation.getCurrentPosition(
-      (pos) => {
-        setLatitude(pos.coords.latitude);
-        setLongitude(pos.coords.longitude);
-      },
-      (error) => {
-        if (error.code === error.PERMISSION_DENIED) {
-          Alert.alert('Erro', 'Permissão de localização negada. Verifique as configurações do dispositivo.');
-        } else if (error.code === error.POSITION_UNAVAILABLE) {
-          Alert.alert('Erro', 'Informações de localização não estão disponíveis no momento.');
-        } else if (error.code === error.TIMEOUT) {
-          Alert.alert('Erro', 'Tempo limite excedido ao obter a localização.');
-          } else {
-            Alert.alert('Erro', 'Erro ao obter a localização do usuário: ' + error.message);
-          }
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 120000,
-          maximumAge: 1000,
-        }
-      );
-    }, []);
-    */
-
-
-  async function setDadosLocal(details = null) {
-    setNomeLocal(details.name);
-    setLatitude(details.geometry.location.lat);
-    setLongitude(details.geometry.location.lng);
-
-    if (lat !== 0 && lon !== 0 && nomeLocal !== "") {
-      await Api.post("/users/create", {
-        email, senha, nome, peso, altura, idade, tempoTreino, objetivoP, uriImg, descricao, nomeLocal, lat, lon
-      })
-        .then(res => {
-          setUser(res.data.user);
-          Alert.alert("Sucesso", "Usuário criado com sucesso!");
-          navigation.navigate("TelaHome", { user });
-        })
-        .catch(error => {
-          Alert.alert("Alerta", error.message());
-          return error;
-        });
     }
+  }
+
+  function setDadosLocal(details = null) {
+
+    nomeLocal = details.name;
+    lat = details.geometry.location.lat;
+    lon = details.geometry.location.lng;
+
+    Api.post("/users/create", {
+      email, senha, nome, peso, altura, idade, tempoTreino, objetivoP, uriImg, descricao, nomeLocal, lat, lon
+    }).then(res => {
+
+      const token = res.data.token;
+      const user = res.data.user;
+      setCookie('Token', token);
+      setCookie('UserId', user._id);
+      navigation.navigate("TelaHome");
+    })
+      .catch(error => {
+        Alert.alert("Alerta", error.message());
+        return error;
+      });
+
   }
 
   return (
@@ -132,11 +114,6 @@ const TelaCadastro7 = ({ route }) => {
           onPress={(data, details = null) => {
             if (details && details.geometry && details.geometry.location) {
               setDadosLocal(details)
-              /*setNomeLocal(details.name);
-              setLatitude(details.geometry.location.lat);
-              setLongitude(details.geometry.location.lng);
-              navigation.navigate("TelaHome", {email,senha,nome,peso,altura,idade,tempoTreino,objetivoP,uriImg,descricao,nomeLocal,lat,lon})*/
-
             }
           }}
           query={{
@@ -155,7 +132,7 @@ const TelaCadastro7 = ({ route }) => {
       <View style={[styles.telacadastro7Inner, styles.telacadastro7Bg, { top: 600 }]} />
       <Pressable
         style={styles.buscarEmTodasAsRedesWrapper}
-        onPress={() => { cadastrarUser2() }}
+        onPress={()=>{cadastrarUser2()}}
       >
         <Text
           style={[styles.buscarEmTodasContainer, styles.localizarAcademiaTypo]}

@@ -8,7 +8,7 @@ const senderMessage = ({ message }) => {
 
   return (
     <View 
-      style={{backgroundColor: '#6D28D9', borderRadius: 12, borderTopRightRadius: 0, paddingLeft: 25,
+      style={{backgroundColor: '#fbb469', borderRadius: 12, borderTopRightRadius: 0, paddingLeft: 25,
         paddingRight: 25, paddingTop: 15, paddingBottom: 15, marginLeft: 15, marginRight: 15, marginTop: 10,
         marginBottom: 10, alignSelf:"flex-start", marginLeft:"auto"
       }}

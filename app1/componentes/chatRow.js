@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 const chatRow = ( props ) => {
   const navigation = useNavigation();
 
-  const item = props.matchesDetails;
+  const userSwiped = props.matchesDetails;
 
   return(
     <TouchableOpacity 
@@ -13,15 +13,15 @@ const chatRow = ( props ) => {
         paddingLeft: 25, paddingRight:25, backgroundColor: '#ffffff', marginLeft: 15, marginRight: 15, 
         marginTop: 5, marginBottom: 5, borderRadius: 12, 
       }, styles.cardShadow]}
-      onPress={()=>{navigation.navigate("TelaChat2", {item})}}
+      onPress={()=>{navigation.navigate("TelaChat2", {userSwiped})}}
     >
       <Image
         style={{borderRadius:1000, height: 68, width: 68, marginRight: 20,left:-10}}
-        source={{ uri: item.uriImg }}
+        source={{ uri: userSwiped.uriImg }}
       />
       <View>
         <Text style={{fontSize:18, fontWeight: '600',bottom:5}}>
-          {item.nome}
+          {userSwiped.nome}
         </Text>
         <Text>Diga Olá!</Text>
       </View>

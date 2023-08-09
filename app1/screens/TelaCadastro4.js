@@ -8,9 +8,6 @@ const TelaCadastro4 = ({route}) => {
 
   // Dados da tela anterior
   const {email,senha,nome,peso,altura,idade,tempoTreino} = route.params;
-  
-  // Objetivo principal do usuario
-  const [objetivoP, setObjetivoP] = React.useState("");
 
   return (
     <View style={styles.telacadastro4}>

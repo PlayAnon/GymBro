@@ -12,125 +12,129 @@ import {io} from "socket.io-client";
 const TelaChat2 = ({ route }) => {
   const navigation = useNavigation();
 
-  const { item } = route.params;
+  const { userSwiped } = route.params;
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
-
-  const socket = io.connect("http://192.168.1.106:3000", {transports:["websocket"]});
 
   const [input, setInput] = React.useState("");
   const [messages, setMessages] = React.useState([]);
+  const [socket, setSocket] = React.useState(null);
 
-  Api.get(`/matches/getMessages/${cookies.UserId}/${item._id}`).then(res => {
+  const flatListRef = React.useRef();
+
+  Api.get(`/matches/getMessages/${cookies.UserId}/${userSwiped._id}`).then(res => {
     setMessages(res.data);
+    flatListRef.current?.scrollToEnd();
   }).catch((err)=>{console.log(err)})
 
 
+  React.useEffect(() => {
+    const socketIo = io("http://192.168.1.106:3000", {transports:["websocket"]});
+    setSocket(socketIo);
+    
+    return () => {
+      socketIo.disconnect();
+    };
+  }, []);
+
 
   React.useEffect(() => {
+    if(socket) {
+      socket.emit('register', cookies.UserId);
 
-    // Registrar o ID de usuário com o servidor
-    
-    socket.emit('register', cookies.UserId);
-
-    // Escutar mensagens privadas do servidor
-    socket.on("receiveMessage", data => {
-      setMessages(data);
-    });
-    
-  }, []);
+      socket.on("receiveMessage", data => {
+        setMessages(data);
+        flatListRef.current?.scrollToEnd();
+      });
+    }
+  }, [socket]);
 
   
 
   const sendMessage = () => {
     // Enviar uma mensagem privada
-    socket.emit('privateMessage', { sender: cookies.UserId, receiver: item._id, message: input });
+    socket.emit('privateMessage', { sender: cookies.UserId, receiver: userSwiped._id, message: input });
     setInput('');
   };
 
   return (
     <SafeAreaView style={styles.telachat2}>
-      <View
-        style={[
-          styles.logoquadradogymbro2Wrapper,
-          styles.telachat2ChildPosition,
-        ]}
-      >
-        <Image
-          style={styles.logoquadradogymbro2Icon}
-          resizeMode="cover"
-          source={require("../assets/logoquadradogymbro-2.png")}
-        />
-      </View>
-      <Pressable
-        style={styles.image18}
-        onPress={() => navigation.goBack()}
-      >
-        <Image
-          style={styles.icon}
-          resizeMode="cover"
-          source={require("../assets/image-2.png")}
-        />
-      </Pressable>
-
-      <View style={[styles.image18Parent, styles.parentFlexBox]}>
-        {
-          item.uriImg ?
-            <Image
-              style={styles.image18Icon}
-              source={{ uri: item.uriImg }}
-            />
-            :
-            <Image
-              style={styles.image18Icon}
-              source={require("../assets/image-182.png")}
-            />
-        }
-
-        <Text style={[styles.nomeUsuario]}>
-          {item.nome}
-        </Text>
-      </View>
-
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        keyboardVerticalOffset={10}
-      >
-
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <FlatList
-            data={messages}
-            inverted={-1}
-            style={{ paddingLeft: 4 }}
-            keyExtractor={item => item.timestamp}
-            renderItem={({ item: message }) =>
-              message.sender === cookies.UserId ? (
-                <SenderMessage key={message._id} message={message} />
-              ) : (
-                <ReceiverMessage key={message._id} message={message} item={item} />
-              )
-            }
-          />
-        </TouchableWithoutFeedback>
-
-
+      <View style={{flex:1, maxHeight:150}}>
         <View
-          style={{
-            flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-            borderTopWidth: 1, borderTopColor: '#e5e7eb', paddingLeft: 20, paddingRight: 25,
-            paddingTop: 5, paddingBottom: 5, backgroundColor: '#ffffff'
-          }}
+          style={[
+            styles.logoquadradogymbro2Wrapper,
+            styles.telachat2ChildPosition,
+          ]}
         >
-          <TextInput
-            style={{ height: 50, fontSize: 18 }}
-            placeholder="Digite sua mensagem..."
-            onChangeText={setInput}
-            onSubmitEditing={sendMessage}
-            value={input}
+          <Image
+            style={styles.logoquadradogymbro2Icon}
+            resizeMode="cover"
+            source={require("../assets/logoquadradogymbro-2.png")}
           />
-          <Button onPress={sendMessage} title="Enviar" color="#c86701" />
         </View>
-      </KeyboardAvoidingView>
+        <Pressable
+          style={styles.image18}
+          onPress={() => navigation.goBack()}
+        >
+          <Image
+            style={styles.icon}
+            resizeMode="cover"
+            source={require("../assets/image-2.png")}
+          />
+        </Pressable>
 
+        <View style={[styles.image18Parent, styles.parentFlexBox]}>
+          <Text style={[styles.nomeUsuario]}>
+            {userSwiped.nome}
+          </Text>
+        </View>
+
+      </View>
+
+
+      <View style={{flex:1}}>
+
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={10}
+        >
+
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <FlatList
+              data={messages}
+              ref={flatListRef}
+              style={{ paddingLeft: 4, }}
+              //inverted={-1}
+              keyExtractor={item => item.timestamp}
+              renderItem={({ item: message }) =>
+                message.sender === cookies.UserId ? (
+                  <SenderMessage key={message.timestamp} message={message} />
+                ) : (
+                  <ReceiverMessage key={message.timestamp} message={message} userSwiped={userSwiped} />
+                )
+              }
+            />
+          </TouchableWithoutFeedback>
+
+
+          <View
+            style={{
+              flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+              borderTopWidth: 1, borderTopColor: '#e5e7eb', paddingLeft: 20, paddingRight: 25,
+              paddingTop: 5, paddingBottom: 5, backgroundColor: '#ffffff'
+            }}
+          >
+            <TextInput
+              style={{ height: 50, fontSize: 18 }}
+              placeholder="Digite sua mensagem..."
+              onChangeText={setInput}
+              onSubmitEditing={sendMessage}
+              value={input}
+            />
+            <Button onPress={sendMessage} title="Enviar" color="#c86701" />
+          </View>
+        </KeyboardAvoidingView>
+
+      </View>
 
 
 

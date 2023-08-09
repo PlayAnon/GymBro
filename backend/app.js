@@ -18,7 +18,7 @@ const io = new socket.Server(server, {
 const userSockets = {};
 
 io.on('connection', (socket) => {
-  console.log('Nova conexão estabelecida');
+  //console.log('Nova conexão estabelecida');
 
 io.on('connect_error', (err) => {
   console.log(`connect_error due to ${err.message}`);
