@@ -21,11 +21,12 @@ const TelaChat2 = ({ route }) => {
 
   const flatListRef = React.useRef();
 
-  Api.get(`/matches/getMessages/${cookies.UserId}/${userSwiped._id}`).then(res => {
-    setMessages(res.data);
-    flatListRef.current?.scrollToEnd();
-  }).catch((err)=>{console.log(err)})
-
+  React.useEffect(() => {
+    Api.get(`/matches/getMessages/${cookies.UserId}/${userSwiped._id}`).then(res => {
+      setMessages(res.data);
+      flatListRef.current?.scrollToEnd();
+    }).catch((err)=>{console.log(err)})
+  }, []);
 
   React.useEffect(() => {
     const socketIo = io("http://192.168.1.106:3000", {transports:["websocket"]});
@@ -43,7 +44,12 @@ const TelaChat2 = ({ route }) => {
 
       socket.on("receiveMessage", data => {
         setMessages(data);
-        flatListRef.current?.scrollToEnd();
+
+        Api.get(`/matches/getMessages/${cookies.UserId}/${userSwiped._id}`).then(res => {
+          setMessages(res.data);
+          flatListRef.current?.scrollToEnd();
+        }).catch((err)=>{console.log(err)})
+
       });
     }
   }, [socket]);
@@ -54,6 +60,12 @@ const TelaChat2 = ({ route }) => {
     // Enviar uma mensagem privada
     socket.emit('privateMessage', { sender: cookies.UserId, receiver: userSwiped._id, message: input });
     setInput('');
+    Api.get(`/matches/getMessages/${cookies.UserId}/${userSwiped._id}`).then(res => {
+      setMessages(res.data);
+      flatListRef.current?.scrollToEnd();
+      
+    }).catch((err)=>{console.log(err)})
+  
   };
 
   return (
@@ -103,7 +115,6 @@ const TelaChat2 = ({ route }) => {
               data={messages}
               ref={flatListRef}
               style={{ paddingLeft: 4, }}
-              //inverted={-1}
               keyExtractor={item => item.timestamp}
               renderItem={({ item: message }) =>
                 message.sender === cookies.UserId ? (

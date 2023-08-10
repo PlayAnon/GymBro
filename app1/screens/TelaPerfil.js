@@ -22,50 +22,31 @@ const TelaPerfil = ({route}) => {
   const [idade, setIdade] = React.useState(String(user.idade));
 
   // Objetivo do usuario
-  let [objetivoP, setObjetivoP] = React.useState(String(user.objetivoP));
+  const [objetivoP, setObjetivoP] = React.useState(String(user.objetivoP));
 
   // Descrição do usuario
   const [descricao, setDescricao] = React.useState(String(user.descricao));
-  
-  const verificaTempoTreino = ()=>{
-    if(user.tempoTreino===0){
-      return '0 meses'
-    }else if(user.tempoTreino===1){
-      return '1-12 meses'
-    }else if(user.tempoTreino===2){
-      return '1-2 anos'
-    }else if(user.tempoTreino===3){
-      return '2-3 anos'
-    }else if(user.tempoTreino===4){
-      return 'Mais de 3 anos'
-    }
-  }
+
+  // Tempo de treino do usuario
+  const [tempoTreino, setTempoTreino] = React.useState(String(user.tempoTreino));
 
   const verificaObjetivoPrincipal= ()=>{
-    if(user.objetivoP==='E'){
+    if(objetivoP==='E'){
       return 'Emagrecimento'
     }else{
       return 'Ganho de massa'
     }
   }
 
-
   const atualizaUsuario = ()=>{
 
-    Api.patch(`/users/${user._id}`, {nome, peso, altura, idade, objetivoP, descricao}).then(res =>{
+    Api.patch(`/users/${user._id}`, {nome, peso, altura, idade, objetivoP, descricao, tempoTreino}).then(res =>{
       let user = res.data
       navigation.navigate("TelaPerfil1")
     }).catch(error =>{
       Alert.alert("Alerta", error.response.data.error);
     })   
   }
-  
-  const [isPressed, setIsPressed] = React.useState(true);
-
-  const handleClick = () => {
-    setIsPressed(!isPressed);
-    
-  };
 
   return (
     <View style={styles.telaperfil}>
@@ -129,30 +110,30 @@ const TelaPerfil = ({route}) => {
           <Text style={[styles.nome, styles.nomeClr]}>Tempo de treino</Text>
           <View style={[styles.mesesParent, styles.parentFlexBox]}>
             <Pressable
-              onPress={handleClick}
+              onPress={()=>{setTempoTreino('0')}}
             >
-              <Text style={isPressed?[styles.selectTxt, styles.anos1Typo]:[styles.notSelectTxt, styles.anos1Typo]}>{verificaTempoTreino()}</Text>
+              <Text style={tempoTreino==='0'?[styles.selectTxt, styles.anos1Typo]:[styles.notSelectTxt, styles.anos1Typo]}>0 meses</Text>
             </Pressable>
         
             <Pressable
-              onPress={handleClick}
+              onPress={()=>{setTempoTreino('1')}}
             >
-              <Text style={!isPressed?[styles.selectTxt, styles.anos1Typo]:[styles.notSelectTxt, styles.anos1Typo]}>1-12 meses</Text>
+              <Text style={tempoTreino==='1'?[styles.selectTxt, styles.anos1Typo]:[styles.notSelectTxt, styles.anos1Typo]}>1-12 meses</Text>
             </Pressable>
             <Pressable
-              onPress={handleClick}
+              onPress={()=>{setTempoTreino('2')}}
             >
-              <Text style={!isPressed?[styles.selectTxt, styles.anos1Typo]:[styles.notSelectTxt, styles.anos1Typo]}>1-2 anos</Text>
+              <Text style={tempoTreino==='2'?[styles.selectTxt, styles.anos1Typo]:[styles.notSelectTxt, styles.anos1Typo]}>1-2 anos</Text>
             </Pressable>
             <Pressable
-              onPress={handleClick}
+              onPress={()=>{setTempoTreino('3')}}
             >
-              <Text style={!isPressed?[styles.selectTxt, styles.anos1Typo]:[styles.notSelectTxt, styles.anos1Typo]}>2-3 anos</Text>
+              <Text style={tempoTreino==='3'?[styles.selectTxt, styles.anos1Typo]:[styles.notSelectTxt, styles.anos1Typo]}>2-3 anos</Text>
             </Pressable>
             <Pressable
-              onPress={handleClick}
+              onPress={()=>{setTempoTreino('4')}}
             >
-              <Text style={!isPressed?[styles.selectTxt, styles.anos1Typo]:[styles.notSelectTxt, styles.anos1Typo]}>+3 anos</Text>
+              <Text style={tempoTreino==='4'?[styles.selectTxt, styles.anos1Typo]:[styles.notSelectTxt, styles.anos1Typo]}>+3 anos</Text>
             </Pressable>
           </View>
         </View>
@@ -163,13 +144,13 @@ const TelaPerfil = ({route}) => {
               verificaObjetivoPrincipal() ==="Emagrecimento"
               ? 
                 <Pressable
-                  onPress={()=>{objetivoP = 'G'}}
+                  onPress={()=>{setObjetivoP('G')}}
                 >
                   <Text style={[styles.mAux, styles.mTypo]}>Ganho de massa</Text>
                 </Pressable>
               :
                 <Pressable
-                  onPress={()=>{objetivoP ='E'}}
+                  onPress={()=>{setObjetivoP('E')}}
                 >
                   <Text style={[styles.mAux, styles.mTypo]}>Emagrecimento</Text>
                 </Pressable>

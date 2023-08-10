@@ -46,15 +46,22 @@ function encontrarUsuariosProximos(user, profiles) {
     const aObjetivoIgual = a.perfil.objetivoP === user.objetivoP;
     const bObjetivoIgual = b.perfil.objetivoP === user.objetivoP;
 
-    // Coloca usuários com o mesmo objetivo do usuário de referência primeiro
-    if (aObjetivoIgual && !bObjetivoIgual) {
-      return -1;
-    } else if (!aObjetivoIgual && bObjetivoIgual) {
-      return 1;
-    } else {
-      // Em caso de empate, ordena pela distância
-      return a.distancia - b.distancia;
-    }
+    // Verifica se a distância de a e b é menor que 5
+    const aIsClose = a.distancia < 5;
+    const bIsClose = b.distancia < 5;
+
+    // Se apenas um deles estiver perto (menos de 5), retorna o que está mais próximo
+    if (aIsClose && !bIsClose) return -1;
+    if (!aIsClose && bIsClose) return 1;
+
+    // Se ambos estiverem próximos ou ambos estiverem longe, verifica o objetivo
+    if (aObjetivoIgual && !bObjetivoIgual) return -1;
+    if (!aObjetivoIgual && bObjetivoIgual) return 1;
+
+    // Em caso de empate em ambas as distâncias e objetivos
+    return a.distancia - b.distancia;
+
+  
   });
 
   const usuariosProximos = perfisComDistancias.slice(0, profiles.length).map(element => element.perfil);

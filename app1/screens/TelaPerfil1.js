@@ -53,7 +53,6 @@ const TelaPerfil1 = ({route}) => {
   }
 
   const atualizaFotoUser = (uriImg)=>{
-    console.log(uriImg)
     Api.patch(`/users/${user._id}`, {uriImg}).then(res =>{
 
     }).catch(error =>{

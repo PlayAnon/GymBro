@@ -14,19 +14,19 @@ const io = new socket.Server(server, {
 
 
 
-// Armazenar os sockets de usuário por ID
-const userSockets = {};
+  // Armazenar os sockets de usuário por ID
+  const userSockets = {};
 
-io.on('connection', (socket) => {
-  //console.log('Nova conexão estabelecida');
+  io.on('connection', (socket) => {
+    console.log('Nova conexão estabelecida');
 
-io.on('connect_error', (err) => {
-  console.log(`connect_error due to ${err.message}`);
-});
-  
-io.on('connect_failed', (err) => {
-  console.log(`connect_failed due to ${err.message}`);
-});
+  io.on('connect_error', (err) => {
+    console.log(`connect_error due to ${err.message}`);
+  });
+    
+  io.on('connect_failed', (err) => {
+    console.log(`connect_failed due to ${err.message}`);
+  });
 
   // Guardar o socket do usuário quando o ID do usuário é fornecido
   socket.on('register', (userId) => {
