@@ -20,7 +20,6 @@ import TelaPerfil1 from "./screens/TelaPerfil1";
 import TelaLogout from "./screens/TelaLogout";
 import TelaInfo1 from "./screens/TelaInfo1";
 import TelaChat2 from "./screens/TelaChat2";
-import TelaNotificacao from "./screens/TelaNotificacao";
 import TelaChat from "./screens/TelaChat";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -121,11 +120,6 @@ const App = () => {
             <Stack.Screen
               name="TelaChat2"
               component={TelaChat2}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="TelaNotificacao"
-              component={TelaNotificacao}
               options={{ headerShown: false }}
             />
             <Stack.Screen
