@@ -11,7 +11,7 @@ const UserSchema = new Schema({
     idade: { type: Number, required: true },
     tempoTreino: { type: Number, required: true },
     objetivoP: { type: String, required: true },
-    uriImg: { type: String, required: false }, // MUDAR PARA TRUE DPS
+    uriImg: { type: String, required: false },
     descricao: { type: String, required: true },
     nomeLocal: {type:String, required: false},
     lat: {type:String, required: true},

@@ -26,17 +26,6 @@ const TelaBusca1 = () => {
   });
 }
 
-/*
-React.useEffect(()=>{
-  Api.patch(`/users/findOne/${cookies.UserId}`).then(res =>{
-    setUser(res.data);
-    console.log(user)
-
-  }).catch(error =>{
-    console.log(error.response.data.error);
-  })
-}, []);*/
-
 function encontrarUsuariosProximos(user, profiles) {
 
   const perfisComDistancias = calcularDistancia(user, profiles);
@@ -69,9 +58,6 @@ function encontrarUsuariosProximos(user, profiles) {
   return usuariosProximos;
 }
 
-const usuariosProximos = encontrarUsuariosProximos(user, profiles);
-
-//console.log(usuariosProximos)
 
 
   React.useEffect(()=>{
@@ -79,7 +65,17 @@ const usuariosProximos = encontrarUsuariosProximos(user, profiles);
     Api.get(`/users/getProfiles/${userId}`).then(res =>{
 
       const usersProfiles = res.data;
-      setProfiles(usersProfiles);
+      //setProfiles(usersProfiles);
+
+      Api.patch(`/users/findOne/${cookies.UserId}`).then(res =>{
+        setUser(res.data);
+  
+        const usuariosProximos = encontrarUsuariosProximos(user, usersProfiles);
+        setProfiles(usuariosProximos);
+    
+      }).catch(error =>{
+        console.log(error.response.data.error);
+      })
   
     }).catch(error =>{
       Alert.alert("Alerta", error.response.data.error);
