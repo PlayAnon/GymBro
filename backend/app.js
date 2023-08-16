@@ -4,15 +4,12 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const config = require('./config/config');
 const matches = require('./model/match');
-
 const http = require("http");
 const server = http.createServer(app);
 const socket = require('socket.io');
 const io = new socket.Server(server, {
   transports: ['websocket']
 });
-
-
 
   // Armazenar os sockets de usuário por ID
   const userSockets = {};
@@ -30,7 +27,6 @@ const io = new socket.Server(server, {
 
   // Guardar o socket do usuário quando o ID do usuário é fornecido
   socket.on('register', (userId) => {
-    console.log("Registrando", userId)
     userSockets[userId] = socket;
   });
 
@@ -56,8 +52,6 @@ const io = new socket.Server(server, {
       }
 
       if (userSockets[receiver]) {
-        console.log("Mensagem enviada")
-        console.log(message)
         userSockets[receiver].emit('receiveMessage', message);
       } else {
         console.log(`Usuário ${receiver} não encontrado`);
@@ -70,7 +64,6 @@ const io = new socket.Server(server, {
   });
 
   socket.on('disconnect', () => {
-    console.log('Usuário desconectado');
     // Remover o socket do usuário quando desconectar
     for (let userId in userSockets) {
       if (userSockets[userId] === socket) {
